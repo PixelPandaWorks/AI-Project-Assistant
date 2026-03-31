@@ -248,7 +248,11 @@ Interactive API docs (Swagger UI): `http://localhost:8000/docs`
 
 ## Usage Examples
 
+> **Windows Users:** PowerShell's `curl` is an alias for `Invoke-WebRequest`, which uses different syntax. Use the **PowerShell** examples below, or use the **Swagger UI** at `http://localhost:8000/docs` for a visual interface.
+
 ### Create a Project
+
+**Bash (Linux/Mac):**
 ```bash
 curl -X POST http://localhost:8000/projects/ \
   -H "Content-Type: application/json" \
@@ -265,21 +269,42 @@ curl -X POST http://localhost:8000/projects/ \
   }'
 ```
 
+**PowerShell (Windows):**
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8000/projects/" -Method Post -ContentType "application/json" -Body '{"name": "My App", "brief": {"title": "Mobile Fitness App", "description": "A fitness tracking app with AI coaching", "goals": ["Track workouts", "Provide AI recommendations", "Social features"], "reference_links": ["https://example.com/competitor"], "target_audience": "Fitness enthusiasts aged 18-35", "tech_stack": "React Native, Node.js, PostgreSQL"}}'
+```
+
 ### Chat with Claude
+
+**Bash (Linux/Mac):**
 ```bash
 curl -X POST http://localhost:8000/projects/{project_id}/chat/ \
   -H "Content-Type: application/json" \
   -d '{"message": "What are the main goals of this project?"}'
 ```
 
+**PowerShell (Windows):**
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8000/projects/{project_id}/chat/" -Method Post -ContentType "application/json" -Body '{"message": "What are the main goals of this project?"}'
+```
+
 ### Generate an Image via Chat
+
+**Bash (Linux/Mac):**
 ```bash
 curl -X POST http://localhost:8000/projects/{project_id}/chat/ \
   -H "Content-Type: application/json" \
   -d '{"message": "Generate a logo concept for this fitness app"}'
 ```
 
+**PowerShell (Windows):**
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8000/projects/{project_id}/chat/" -Method Post -ContentType "application/json" -Body '{"message": "Generate a logo concept for this fitness app"}'
+```
+
 ### Trigger the Background Agent
+
+**Bash (Linux/Mac):**
 ```bash
 curl -X POST http://localhost:8000/projects/{project_id}/agent/trigger
 
@@ -287,9 +312,24 @@ curl -X POST http://localhost:8000/projects/{project_id}/agent/trigger
 curl http://localhost:8000/agent/status/{execution_id}
 ```
 
+**PowerShell (Windows):**
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8000/projects/{project_id}/agent/trigger" -Method Post
+
+# Poll status
+Invoke-RestMethod -Uri "http://localhost:8000/agent/status/{execution_id}"
+```
+
 ### View Project Memory
+
+**Bash (Linux/Mac):**
 ```bash
 curl http://localhost:8000/projects/{project_id}/memory
+```
+
+**PowerShell (Windows):**
+```powershell
+Invoke-RestMethod -Uri "http://localhost:8000/projects/{project_id}/memory"
 ```
 
 ---

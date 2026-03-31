@@ -11,6 +11,9 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
 
 from app.config import settings
 from app.routers import projects, chat, images, agents
@@ -64,6 +67,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Mount static files
+static_dir = os.path.join(os.path.dirname(__file__), "static")
+os.makedirs(static_dir, exist_ok=True)
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
+
 # Mount routers
 app.include_router(projects.router)
 app.include_router(chat.router)
@@ -71,14 +79,13 @@ app.include_router(images.router)
 app.include_router(agents.router)
 
 
-@app.get("/", tags=["health"])
+@app.get("/", tags=["ui"])
 async def root():
-    """Health check endpoint."""
-    return {
-        "status": "healthy",
-        "service": "AI Project Assistant",
-        "version": "1.0.0",
-    }
+    """Serve the SPA interface."""
+    index_path = os.path.join(static_dir, "index.html")
+    if os.path.exists(index_path):
+        return FileResponse(index_path)
+    return {"message": "UI not built yet. Create app/static/index.html"}
 
 
 @app.get("/health", tags=["health"])

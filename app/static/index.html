@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Project Assistant</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<div class="app-container">
+  
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar glass-panel">
+    <div class="sidebar-header">
+      <i data-lucide="bot"></i>
+      <h1>AI Assistant</h1>
+    </div>
+    <button class="btn btn-primary" id="btn-new-project" style="margin-bottom: 24px;">
+      <i data-lucide="plus"></i> New Project
+    </button>
+    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 8px; font-weight: 500;">
+      YOUR PROJECTS
+    </div>
+    <div class="project-list" id="project-list">
+      <!-- Projects dynamically populated here -->
+    </div>
+  </aside>
+
+  <!-- MAIN CHAT AREA -->
+  <main class="main-chat glass-panel">
+    <div class="chat-header">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <i data-lucide="message-square" style="color: var(--accent);"></i>
+        <h2 id="current-project-name" style="font-size: 1.1rem; font-weight: 600;">Select a Project</h2>
+      </div>
+      <button class="btn hidden" id="btn-trigger-agent">
+        <i data-lucide="zap"></i> Run Agent
+      </button>
+    </div>
+    
+    <div class="chat-messages" id="chat-messages">
+      <!-- Welcome message -->
+      <div class="message assistant" style="align-self: center; margin: auto; opacity: 0.7; transform: none; display: flex; flex-direction: column; align-items: center; text-align: center;">
+        <i data-lucide="sparkles" style="width: 48px; height: 48px; margin-bottom: 16px; color: var(--accent);"></i>
+        <h3>Welcome to your AI Project Assistant</h3>
+        <p style="font-size: 0.9rem; margin-top: 8px; max-width: 300px;">Create a new project on the left to start planning, discussing, and managing your ideas.</p>
+      </div>
+    </div>
+    
+    <div class="chat-input-container hidden" id="chat-input-container">
+      <div class="chat-input-wrapper">
+        <textarea id="chat-input" class="chat-input" rows="1" placeholder="Send a message to Claude... (Shift+Enter for newline)"></textarea>
+        <button class="send-btn" id="btn-send-message">
+          <i data-lucide="send" style="width: 18px; height: 18px;"></i>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <!-- RIGHT PANEL -->
+  <aside class="right-panel glass-panel hidden" id="right-panel">
+    <div class="tabs">
+      <div class="tab active" data-tab="brief">Brief</div>
+      <div class="tab" data-tab="memory">Memory</div>
+      <div class="tab" data-tab="images">Images</div>
+    </div>
+    
+    <div class="panel-content">
+      <!-- Brief Tab -->
+      <div class="tab-pane active" id="tab-brief">
+        <h3 style="margin-bottom: 16px; font-size: 1rem;" id="brief-title">Project Brief</h3>
+        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 24px;" id="brief-desc"></p>
+        
+        <div id="brief-details">
+          <!-- Dynamic key-values here -->
+        </div>
+      </div>
+      
+      <!-- Memory Tab -->
+      <div class="tab-pane" id="tab-memory">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="font-size: 1rem;">Project Memory</h3>
+          <button class="btn" id="btn-refresh-memory" style="padding: 4px 8px;"><i data-lucide="refresh-cw" style="width:14px; height:14px;"></i></button>
+        </div>
+        <div id="memory-list">
+          <!-- Dynamic memory blocks here -->
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">No memory blocks stored yet.</p>
+        </div>
+      </div>
+
+      <!-- Images Tab -->
+      <div class="tab-pane" id="tab-images">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <h3 style="font-size: 1rem;">Generated Assets</h3>
+          <button class="btn" id="btn-refresh-images" style="padding: 4px 8px;"><i data-lucide="refresh-cw" style="width:14px; height:14px;"></i></button>
+        </div>
+        <div class="images-grid" id="images-grid">
+          <!-- Dynamic images here -->
+          <p style="font-size: 0.85rem; color: var(--text-secondary); grid-column: 1 / -1;">No images generated yet.</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+</div>
+
+<!-- NEW PROJECT MODAL -->
+<div class="modal-overlay" id="modal-project">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 style="font-size: 1.25rem;">Create New Project</h2>
+      <button class="btn" id="btn-close-modal" style="background: none; border: none; padding: 4px;"><i data-lucide="x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label>Project Name</label>
+        <input type="text" id="form-name" placeholder="e.g. Health Tracking App" required>
+      </div>
+      <div class="form-group">
+        <label>Brief Title</label>
+        <input type="text" id="form-title" placeholder="e.g. FitPulse MVP" required>
+      </div>
+      <div class="form-group">
+        <label>Description</label>
+        <textarea id="form-desc" rows="3" placeholder="Describe the project..." required></textarea>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" id="btn-cancel-modal">Cancel</button>
+      <button class="btn btn-primary" id="btn-submit-project">Create Project</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCRIPTS -->
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="/static/js/api.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>
