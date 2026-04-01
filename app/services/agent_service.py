@@ -63,21 +63,32 @@ async def run_organizer_agent(project_id: str, execution_id: str) -> None:
     try:
         # Mark as running
         _update_execution_status(execution_id, "running")
-        logger.info(f"Agent started for project {project_id} (execution {execution_id})")
+        logger.info(f"\n{'='*60}")
+        logger.info(f"🤖 [AGENT] Background agent started")
+        logger.info(f"📁 [AGENT] Project ID: {project_id}")
+        logger.info(f"🆔 [AGENT] Execution ID: {execution_id}")
 
         # 1. Gather all project data
+        logger.info(f"📥 [AGENT] Gathering all project data from Supabase...")
+        logger.info(f"🔑 [AGENT] Using SUPABASE_KEY for data retrieval")
         project_data = await _gather_project_data(project_id)
+        logger.info(f"✅ [AGENT] Data gathered: {len(project_data.get('conversations', []))} conversations, {len(project_data.get('images', []))} images, {len(project_data.get('existing_memory', []))} memory entries")
 
         # 2. Build the prompt
         prompt = _build_organization_prompt(project_data)
 
         # 3. Send to Claude
+        logger.info(f"🤖 [AGENT] Sending to Claude for organization")
+        logger.info(f"🔑 [AGENT] Using ANTHROPIC_API_KEY → Claude API")
+        logger.info(f"🤖 [AGENT] Model: {settings.CLAUDE_MODEL}")
+        logger.info(f"⏳ [AGENT] Calling Claude API...")
         response = agent_client.messages.create(
             model=settings.CLAUDE_MODEL,
             max_tokens=4096,
             system=AGENT_SYSTEM_PROMPT,
             messages=[{"role": "user", "content": prompt}],
         )
+        logger.info(f"✅ [AGENT] Claude response received")
 
         response_text = ""
         for block in response.content:
@@ -85,7 +96,9 @@ async def run_organizer_agent(project_id: str, execution_id: str) -> None:
                 response_text += block.text
 
         # 4. Parse the structured output
+        logger.info(f"📋 [AGENT] Parsing structured output ({len(response_text)} chars)")
         memory_entries = _parse_agent_output(response_text)
+        logger.info(f"✅ [AGENT] Parsed {len(memory_entries)} memory entries")
 
         # 5. Save each memory entry to the database
         saved_count = 0
@@ -145,10 +158,11 @@ async def run_organizer_agent(project_id: str, execution_id: str) -> None:
                 "summary": f"Organized project data into {saved_count} structured memory entries.",
             },
         )
-        logger.info(f"Agent completed for project {project_id}: {saved_count} entries saved")
+        logger.info(f"✅ [AGENT] Completed! Saved {saved_count} memory entries for project {project_id}")
+        logger.info(f"{'='*60}")
 
     except Exception as e:
-        logger.error(f"Agent failed for project {project_id}: {str(e)}")
+        logger.error(f"❌ [AGENT] Failed for project {project_id}: {str(e)}")
         _update_execution_status(
             execution_id,
             "failed",

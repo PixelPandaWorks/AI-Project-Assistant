@@ -24,7 +24,7 @@ class Settings:
     GEMINI_MODEL: str = "gemini-2.0-flash"
 
     # DALL-E model
-    DALLE_MODEL: str = "dall-e-3"
+    DALLE_MODEL: str = "gpt-image-1"
 
     def validate(self) -> list[str]:
         """Return a list of missing required keys."""
