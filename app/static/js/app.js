@@ -256,8 +256,8 @@ function appendMessageToUI(msg) {
       <div class="tool-call">
         <i data-lucide="wrench" style="width: 14px; margin-top: 2px;"></i>
         <div>
-          <div style="font-weight: 500; color: #94a3b8; margin-bottom: 4px;">Used tool: ${tc.name}</div>
-          <pre>${JSON.stringify(tc.arguments, null, 2)}</pre>
+          <div style="font-weight: 500; color: #94a3b8; margin-bottom: 4px;">Used tool: ${tc.tool || tc.name}</div>
+          <pre>${JSON.stringify(tc.input || tc.arguments, null, 2)}</pre>
         </div>
       </div>
     `).join('');
@@ -339,7 +339,7 @@ async function handleSendMessage() {
     
     // If tool calls were made, it's a good idea to refresh memory or images
     if (res.tool_calls && res.tool_calls.length) {
-      const toolNames = res.tool_calls.map(t => t.name);
+      const toolNames = res.tool_calls.map(t => t.tool || t.name);
       if (toolNames.includes('save_project_memory')) loadProjectMemory(currentProjectId);
       if (toolNames.includes('generate_image')) loadProjectImages(currentProjectId);
     }
@@ -363,7 +363,7 @@ async function loadProjectMemory(id) {
     els.memoryList.innerHTML = '';
     
     if (memory.length === 0) {
-      els. памятиList.innerHTML = `<p style="font-size: 0.85rem; color: var(--text-secondary);">No memory blocks stored yet.</p>`;
+      els.memoryList.innerHTML = `<p style="font-size: 0.85rem; color: var(--text-secondary);">No memory blocks stored yet.</p>`;
       return;
     }
     
@@ -371,12 +371,19 @@ async function loadProjectMemory(id) {
       const isAgent = m.source === 'agent';
       const div = document.createElement('div');
       div.className = 'key-value';
+
+      // Extract string from memory_value (it's a JSON object like {"content": "..."})
+      let displayValue = m.memory_value;
+      if (typeof displayValue === 'object' && displayValue !== null) {
+        displayValue = displayValue.content || JSON.stringify(displayValue, null, 2);
+      }
+
       div.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center;">
           <div class="key">${m.memory_key}</div>
           ${isAgent ? '<span style="font-size:0.65rem; background:#4f46e5; color:white; padding:2px 6px; border-radius:4px;">Auto</span>' : ''}
         </div>
-        <div class="value">${marked.parse(m.memory_value)}</div>
+        <div class="value">${marked.parse(String(displayValue))}</div>
       `;
       els.memoryList.appendChild(div);
     });
@@ -401,14 +408,15 @@ async function loadProjectImages(id) {
       const div = document.createElement('div');
       div.className = 'img-card';
       
-      // We assume DALL-E returns a b64 string or URL. Adjust based on your DB output.
-      // If it's a URL in img.openai_url:
-      const url = img.openai_url || (img.image_url); // adapt property names as needed
+      const url = img.url;
+      const promptText = img.prompt ? img.prompt.substring(0, 60) + (img.prompt.length > 60 ? '...' : '') : '';
       
       div.innerHTML = `
         <a href="${url}" target="_blank">
-          <img src="${url}" alt="Generated Image" loading="lazy" />
+          <img src="${url}" alt="Generated Image" loading="lazy"
+               onerror="this.onerror=null; this.parentElement.innerHTML='<div style=\\"display:flex;align-items:center;justify-content:center;height:100%;color:var(--text-secondary);font-size:0.8rem;padding:12px;text-align:center;\\">Image unavailable<br/>(expired or invalid URL)</div>';" />
         </a>
+        ${promptText ? `<div style="padding:6px 8px; font-size:0.75rem; color:var(--text-secondary); border-top:1px solid var(--border); overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${img.prompt}">${promptText}</div>` : ''}
       `;
       els.imagesGrid.appendChild(div);
     });
