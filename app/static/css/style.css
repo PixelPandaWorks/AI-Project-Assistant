@@ -1,9 +1,9 @@
 :root {
   --bg-dark: #0f172a;
-  --bg-panel: rgba(30, 41, 59, 0.7);
+  --bg-panel: rgba(12, 23, 41, 0.201);
   --bg-surface: rgba(15, 23, 42, 0.6);
   --accent: #3b82f6;
-  --accent-hover: #2563eb;
+  --accent-hover: #000000;
   --text-primary: #f8fafc;
   --text-secondary: #94a3b8;
   --border: rgba(255, 255, 255, 0.1);
@@ -26,8 +26,8 @@ body {
   height: 100vh;
   overflow: hidden;
   background-image: 
-    radial-gradient(circle at 15% 50%, rgba(59, 130, 246, 0.08) 0%, transparent 50%),
-    radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.08) 0%, transparent 50%);
+    radial-gradient(circle at 15% 50%, rgba(41, 42, 43, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 85% 30%, rgba(41, 42, 43, 0.08) 0%, transparent 50%);
 }
 
 .glass-panel {
@@ -64,7 +64,7 @@ body {
 .sidebar-header h1 {
   font-size: 1.25rem;
   font-weight: 600;
-  background: linear-gradient(135deg, #60a5fa, #a78bfa);
+  background: linear-gradient(135deg, #303335, #bab8c1);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
